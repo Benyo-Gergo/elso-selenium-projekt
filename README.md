@@ -1,18 +1,24 @@
-# Első Selenium Projektem 🤖
+🤖 SauceDemo Automation Bot
+This project is a Python-based automation script using Selenium WebDriver. It interacts with the standard SauceDemo e-commerce test site to demonstrate automated testing capabilities.
 
-Ez a program automatikusan belép a SauceDemo tesztoldalra, és végrehajt egy vásárlási folyamatot.
+🚀 Features
+Automated Login: Bypasses the login screen securely. 🔐
 
-## 🛠️ Használt technológiák
-* Python 3
-* Selenium WebDriver
-* Git & GitHub
+Price Filtering: Automatically selects products under a specific price limit (e.g., $15). 💰
 
-## 🚀 Mit csinál a robot?
-1. Megnyitja a böngészőt.
-2. Bejelentkezik titkosított jelszóval.
-3. Megkeresi a legolcsóbb termékeket.
-4. Kosárba teszi őket.
-5. Jelentést készít (`.txt`) a vásárlásról.
+Reporting: Generates a detailed .txt report of the purchased items. 📄
 
-## ✍️ Szerző
-Benyó Gergő
+🛠️ Tech Stack
+Python 3 🐍
+
+Selenium WebDriver 🌐
+
+Git & GitHub 🐙
+
+📦 How to Run
+Install dependencies: pip install selenium webdriver-manager
+
+Run the script: python main.py
+
+👤 Author
+Gergo Benyo QA Automation Enthusiast 👨‍💻

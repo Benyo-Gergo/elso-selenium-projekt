@@ -1,24 +1,33 @@
-🤖 SauceDemo Automation Bot
-This project is a Python-based automation script using Selenium WebDriver. It interacts with the standard SauceDemo e-commerce test site to demonstrate automated testing capabilities.
+# 🤖 Advanced SauceDemo Automation Bot
 
-🚀 Features
-Automated Login: Bypasses the login screen securely. 🔐
+A professional-grade Python automation script using **Selenium WebDriver**. This project demonstrates robust web interaction, secure credential handling, and automated reporting.
 
-Price Filtering: Automatically selects products under a specific price limit (e.g., $15). 💰
+## 🚀 Key Features
+* **Secure Login:** Uses `.env` files to handle credentials safely (no hardcoded passwords). 🔐
+* **Error Resilience:** Implemented `try-except` blocks with **automatic screenshots** on failure. 📸
+* **Technical Logging:** Generates a `robot.log` file with timestamps and error levels for debugging. 📄
+* **Smart Reporting:** Automatically creates unique, timestamped `.txt` reports of all purchases. 💰
+* **Data-Driven Logic:** Filters products based on price limits dynamically.
 
-Reporting: Generates a detailed .txt report of the purchased items. 📄
+## 🛠️ Tech Stack
+* **Python 3** 🐍
+* **Selenium WebDriver** 🌐
+* **python-dotenv** (Environment variable management)
+* **Webdriver-manager** (Automated driver handling)
 
-🛠️ Tech Stack
-Python 3 🐍
+## 📦 Installation & Usage
+1.  **Clone the repo:**
+    `git clone https://github.com/Benyo-Gergo/elso-selenium-projekt.git`
+2.  **Install dependencies:**
+    `pip install selenium webdriver-manager python-dotenv`
+3.  **Setup Credentials:** Create a `.env` file in the root folder:
+    ```text
+    SAUCE_USER=your_username
+    SAUCE_PASSWORD=your_password
+    ```
+4.  **Run the script:**
+    `python main.py`
 
-Selenium WebDriver 🌐
-
-Git & GitHub 🐙
-
-📦 How to Run
-Install dependencies: pip install selenium webdriver-manager
-
-Run the script: python main.py
-
-👤 Author
-Gergo Benyo QA Automation Enthusiast 👨‍💻
+## 👤 Author
+**Gergo Benyo**
+*QA Automation Enthusiast* 👨‍💻

@@ -2,19 +2,16 @@ import os
 import time
 import logging
 import datetime
-import pandas as pd  # <--- Ez kell az Excelhez!
 from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
-# 1. KÖRNYEZETI VÁLTOZÓK BETÖLTÉSE
+# 1. KÖRNYEZETI VÁLTOZÓK BETÖLTÉSE (.env fájlból)
 load_dotenv()
 
-# 2. NAPLÓZÁS BEÁLLÍTÁSA
+# 2. NAPLÓZÁS (LOGGING) BEÁLLÍTÁSA
 logging.basicConfig(
     filename='robot.log',
     level=logging.INFO,
@@ -29,7 +26,7 @@ options.add_argument("--disable-notifications")
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
 
-# Globális lista - ide gyűjtjük az adatokat szótár formátumban a Pandasnak
+# Globális lista a vásárolt termékeknek
 megvett_termekek = []
 
 # --- FUNKCIÓK ---
@@ -42,33 +39,22 @@ def bejelentkezes():
 
         driver.get("https://www.saucedemo.com/")
         driver.maximize_window()
+        time.sleep(1)
 
-        # WebDriverWait - nem vár fixen, csak amíg meg nem jelenik az elem
-        wait = WebDriverWait(driver, 10)
-
-        user_field = wait.until(EC.element_to_be_clickable((By.ID, "user-name")))
-        user_field.send_keys(user)
-
-        pass_field = wait.until(EC.element_to_be_clickable((By.ID, "password")))
-        pass_field.send_keys(password)
-
-        login_button = wait.until(EC.element_to_be_clickable((By.ID, "login-button")))
-        login_button.click()
+        driver.find_element(By.ID, "user-name").send_keys(user)
+        driver.find_element(By.ID, "password").send_keys(password)
+        driver.find_element(By.ID, "login-button").click()
         
         logging.info("Sikeres bejelentkezés.")
+        time.sleep(2)
     except Exception as e:
         logging.error(f"Hiba a bejelentkezésnél: {e}")
         driver.save_screenshot("login_hiba.png")
-        raise
+        raise # Megállítjuk a programot, ha nem sikerült belépni
 
-def vasarlas(ar_limit): # <--- EZ HIÁNYZOTT!
+def vasarlas(ar_limit):
     try:
         logging.info(f"--- Vásárlás indítása ${ar_limit} alatt ---")
-        wait = WebDriverWait(driver, 10)
-        
-        # Várunk, amíg legalább egy termék ára megjelenik
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "inventory_item_price")))
-
         ar_elemek = driver.find_elements(By.CLASS_NAME, "inventory_item_price")
         nev_elemek = driver.find_elements(By.CLASS_NAME, "inventory_item_name")
         gombok = driver.find_elements(By.CLASS_NAME, "btn_inventory")
@@ -80,45 +66,42 @@ def vasarlas(ar_limit): # <--- EZ HIÁNYZOTT!
             
             if ar_szam < ar_limit:
                 gombok[i].click()
-                # Szótárként mentjük az adatot a Pandas miatt
-                megvett_termekek.append({
-                    "Termék Neve": nev,
-                    "Ár ($)": ar_szam,
-                    "Vásárlás Időpontja": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                })
+                megvett_termekek.append(f"{nev} - ${ar_szam}")
                 logging.info(f"Kosárba téve: {nev}")
     except Exception as e:
         logging.error(f"Hiba a vásárlás során: {e}")
 
-def jelentes_iras_excel(): # <--- Átnevezve a modern változatra
+def jelentes_iras():
     try:
-        if not megvett_termekek:
-            logging.info("Nem történt vásárlás, nem készül Excel.")
-            return
-
-        # Pandas táblázat készítése a listából
-        df = pd.DataFrame(megvett_termekek)
-        
         most = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        fajlnev = f"riport_{most}.xlsx"
+        fajlnev = f"riport_{most}.txt"
         
-        # Mentés Excelbe
-        df.to_excel(fajlnev, index=False)
+        with open(fajlnev, "w", encoding="utf-8") as fajl:
+            fajl.write(f"VÁSÁRLÁSI RIPORT - {most}\n")
+            fajl.write("----------------\n")
+            if not megvett_termekek:
+                fajl.write("Nem történt vásárlás.\n")
+            else:
+                for t in megvett_termekek:
+                    fajl.write(f"Megvett tétel: {t}\n")
+            fajl.write("----------------\n")
+            fajl.write(f"Összesen: {len(megvett_termekek)} db termék.\n")
         
-        print(f"Excel riport elkészült: {fajlnev}")
-        logging.info(f"Excel riport sikeresen mentve: {fajlnev}")
+        print(f"Riport elkészült: {fajlnev}")
+        logging.info(f"Riport sikeresen mentve: {fajlnev}")
     except Exception as e:
-        logging.error(f"Nem sikerült az Excel jelentés írása: {e}")
+        logging.error(f"Nem sikerült a riportot megírni: {e}")
 
 # --- FŐ PROGRAMFUTTATÁS ---
 
 if __name__ == "__main__":
     try:
         bejelentkezes()
-        vasarlas(20.00) 
-        jelentes_iras_excel() # Most már az Excelt hívjuk meg!
+        vasarlas(20.00) # Itt állíthatod az árlimitet
+        jelentes_iras()
     except Exception as e:
         print(f"Váratlan hiba történt a futás során: {e}")
     finally:
+        # Ez a rész mindig lefut: bezárja a böngészőt
         driver.quit()
         print("Böngésző bezárva, program vége.")

@@ -1,6 +1,11 @@
+# Jelszavak és titkok
 .env
-*.log
-riport_*.txt
-*.png
+
+# Python szemét
 __pycache__/
-profi_jelentes.txt
+*.py[cod]
+
+# Robotunk által gyártott fájlok
+*.xlsx
+*.log
+*.png
